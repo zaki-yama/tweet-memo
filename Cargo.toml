@@ -1,0 +1,19 @@
+[package]
+name = "tw"
+version = "0.1.0"
+edition = "2021"
+description = "Twitter風つぶやきをMarkdownファイルに記録するCLIツール"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+
+[[bin]]
+name = "tw"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "5.0"
+anyhow = "1.0"
