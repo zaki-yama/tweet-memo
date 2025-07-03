@@ -31,36 +31,36 @@ impl Config {
         } else {
             let config = Self::default();
             config.save(&config_path)?;
-            println!("設定ファイルを作成しました: {}", config_path.display());
+            println!("Configuration file created: {}", config_path.display());
             Ok(config)
         }
     }
 
     fn load(path: &PathBuf) -> Result<Self> {
         let content = fs::read_to_string(path)
-            .with_context(|| format!("設定ファイルの読み込みに失敗しました: {}", path.display()))?;
+            .with_context(|| format!("Failed to read config file: {}", path.display()))?;
 
-        toml::from_str(&content).with_context(|| "設定ファイルの解析に失敗しました")
+        toml::from_str(&content).with_context(|| "Failed to parse config file")
     }
 
     fn save(&self, path: &PathBuf) -> Result<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent).with_context(|| {
-                format!("設定ディレクトリの作成に失敗しました: {}", parent.display())
+                format!("Failed to create config directory: {}", parent.display())
             })?;
         }
 
         let content = toml::to_string_pretty(self)
-            .with_context(|| "設定ファイルのシリアライズに失敗しました")?;
+            .with_context(|| "Failed to serialize config file")?;
 
         fs::write(path, content)
-            .with_context(|| format!("設定ファイルの書き込みに失敗しました: {}", path.display()))?;
+            .with_context(|| format!("Failed to write config file: {}", path.display()))?;
 
         Ok(())
     }
 
     fn config_path() -> Result<PathBuf> {
-        let config_dir = dirs::config_dir().context("設定ディレクトリが見つかりません")?;
+        let config_dir = dirs::config_dir().context("Config directory not found")?;
 
         Ok(config_dir.join("tw").join("config.toml"))
     }

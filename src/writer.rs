@@ -19,19 +19,19 @@ impl TweetWriter {
 
         if !file_path.exists() {
             return Err(anyhow!(
-                "対象ファイルが存在しません: {}",
+                "Target file does not exist: {}",
                 file_path.display()
             ));
         }
 
         let content = fs::read_to_string(&file_path).with_context(|| {
-            format!("ファイルの読み込みに失敗しました: {}", file_path.display())
+            format!("Failed to read file: {}", file_path.display())
         })?;
 
         let new_content = self.insert_tweet_into_content(&content, text)?;
 
         fs::write(&file_path, new_content).with_context(|| {
-            format!("ファイルの書き込みに失敗しました: {}", file_path.display())
+            format!("Failed to write file: {}", file_path.display())
         })?;
 
         Ok(())
@@ -43,7 +43,7 @@ impl TweetWriter {
 
         if !dir_path.exists() {
             return Err(anyhow!(
-                "対象ディレクトリが存在しません: {}",
+                "Target directory does not exist: {}",
                 dir_path.display()
             ));
         }
@@ -76,7 +76,7 @@ impl TweetWriter {
 
         if !section_found {
             return Err(anyhow!(
-                "対象セクション '{}' が見つかりません",
+                "Target section '{}' not found",
                 self.config.target_section
             ));
         }

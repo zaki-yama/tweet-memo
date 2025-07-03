@@ -9,22 +9,22 @@ use writer::TweetWriter;
 
 fn main() -> Result<()> {
     let matches = Command::new("tw")
-        .about("Twitter風つぶやきをMarkdownファイルに記録するCLIツール")
+        .about("CLI tool for recording Twitter-style tweets to Markdown files")
         .version("0.1.0")
-        .arg(Arg::new("text").help("記録するテキスト").index(1))
+        .arg(Arg::new("text").help("Text to record").index(1))
         .get_matches();
 
     let text = if let Some(text) = matches.get_one::<String>("text") {
         text.clone()
     } else {
-        println!("つぶやきを入力してください:");
+        println!("Please enter your tweet:");
         let mut input = String::new();
         std::io::stdin().read_line(&mut input)?;
         input.trim().to_string()
     };
 
     if text.is_empty() {
-        println!("テキストが入力されていません。");
+        println!("No text entered.");
         return Ok(());
     }
 
@@ -32,7 +32,7 @@ fn main() -> Result<()> {
     let writer = TweetWriter::new(config);
 
     writer.write_tweet(&text)?;
-    println!("つぶやきを記録しました: {}", text);
+    println!("Tweet recorded: {}", text);
 
     Ok(())
 }
