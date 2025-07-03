@@ -132,3 +132,121 @@ impl TweetWriter {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::{Datelike, Local};
+    use tempfile::TempDir;
+
+    fn create_test_config() -> Config {
+        Config {
+            target_directory: "/tmp".to_string(),
+            filename_format: "test.md".to_string(),
+            entry_format: "[HH:mm:ss] {text}".to_string(),
+            target_section: "### Tweets".to_string(),
+        }
+    }
+
+    #[test]
+    fn test_tweet_writer_new() {
+        let config = create_test_config();
+        let writer = TweetWriter::new(config.clone());
+        assert_eq!(writer.config.target_directory, config.target_directory);
+    }
+
+    #[test]
+    fn test_get_heading_level() {
+        let config = create_test_config();
+        let writer = TweetWriter::new(config);
+
+        assert_eq!(writer.get_heading_level("# Heading 1"), 1);
+        assert_eq!(writer.get_heading_level("## Heading 2"), 2);
+        assert_eq!(writer.get_heading_level("### Heading 3"), 3);
+        assert_eq!(writer.get_heading_level("#### Heading 4"), 4);
+        assert_eq!(writer.get_heading_level("Not a heading"), 0);
+    }
+
+    #[test]
+    fn test_format_tweet() {
+        let config = create_test_config();
+        let writer = TweetWriter::new(config);
+        let text = "Test tweet";
+        let formatted = writer.format_tweet(text);
+
+        assert!(formatted.starts_with("- ["));
+        assert!(formatted.contains("] Test tweet"));
+    }
+
+    #[test]
+    fn test_find_section_end() {
+        let config = create_test_config();
+        let writer = TweetWriter::new(config);
+
+        let lines = vec![
+            "# Main Title",
+            "Some content",
+            "### Tweets",
+            "- Tweet 1",
+            "- Tweet 2",
+            "## Next Section",
+            "More content",
+        ];
+
+        let end_pos = writer.find_section_end(&lines, 2); // Index of "### Tweets"
+        assert_eq!(end_pos, 5); // Should stop at "## Next Section"
+    }
+
+    #[test]
+    fn test_insert_tweet_into_content() {
+        let config = create_test_config();
+        let writer = TweetWriter::new(config);
+
+        let content = r#"# Daily Notes
+
+## Tasks
+- Do something
+
+### Tweets
+
+### Notes
+Some notes here"#;
+
+        let result = writer.insert_tweet_into_content(content, "Test tweet").unwrap();
+        assert!(result.contains("### Tweets"));
+        assert!(result.contains("Test tweet"));
+    }
+
+    #[test]
+    fn test_insert_tweet_section_not_found() {
+        let mut config = create_test_config();
+        config.target_section = "### NonExistent".to_string();
+        let writer = TweetWriter::new(config);
+
+        let content = r#"# Daily Notes
+
+## Tasks
+- Do something"#;
+
+        let result = writer.insert_tweet_into_content(content, "Test tweet");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("not found"));
+    }
+
+    #[test]
+    fn test_filename_format_replacement() {
+        let temp_dir = TempDir::new().unwrap();
+        let mut config = create_test_config();
+        config.target_directory = temp_dir.path().to_string_lossy().to_string();
+        config.filename_format = "YYYY-MM-DD.md".to_string();
+        
+        let writer = TweetWriter::new(config);
+        let file_path = writer.get_target_file_path().unwrap();
+        
+        let now = Local::now();
+        let expected_filename = format!("{}-{:02}-{:02}.md", 
+            now.year(), now.month(), now.day());
+        
+        assert!(file_path.to_string_lossy().ends_with(&expected_filename));
+    }
+}

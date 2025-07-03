@@ -74,3 +74,49 @@ impl Config {
         path.to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_config() {
+        let config = Config::default();
+        assert_eq!(config.target_directory, "~/Documents/daily-notes");
+        assert_eq!(config.filename_format, "YYYY-MM-DD.md");
+        assert_eq!(config.entry_format, "[HH:mm:ss] {text}");
+        assert_eq!(config.target_section, "### Tweets");
+    }
+
+    #[test]
+    fn test_expand_path_with_tilde() {
+        let config = Config::default();
+        let path = "~/test/path";
+        let expanded = config.expand_path(path);
+        
+        if let Some(home_dir) = dirs::home_dir() {
+            let expected = format!("{}/test/path", home_dir.to_string_lossy());
+            assert_eq!(expanded, expected);
+        }
+    }
+
+    #[test]
+    fn test_expand_path_without_tilde() {
+        let config = Config::default();
+        let path = "/absolute/path";
+        let expanded = config.expand_path(path);
+        assert_eq!(expanded, path);
+    }
+
+    #[test]
+    fn test_config_serialization() {
+        let config = Config::default();
+        let toml_str = toml::to_string(&config).unwrap();
+        let deserialized: Config = toml::from_str(&toml_str).unwrap();
+        
+        assert_eq!(config.target_directory, deserialized.target_directory);
+        assert_eq!(config.filename_format, deserialized.filename_format);
+        assert_eq!(config.entry_format, deserialized.entry_format);
+        assert_eq!(config.target_section, deserialized.target_section);
+    }
+}
