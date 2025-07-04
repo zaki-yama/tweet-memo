@@ -14,6 +14,9 @@ fn main() -> Result<()> {
         .arg(Arg::new("text").help("Text to record").index(1))
         .get_matches();
 
+    // Load or create config first
+    let config = Config::load_or_create()?;
+
     let text = if let Some(text) = matches.get_one::<String>("text") {
         text.clone()
     } else {
@@ -28,7 +31,6 @@ fn main() -> Result<()> {
         return Ok(());
     }
 
-    let config = Config::load_or_create()?;
     let writer = TweetWriter::new(config);
 
     writer.write_tweet(&text)?;
