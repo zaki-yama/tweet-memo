@@ -24,15 +24,13 @@ impl TweetWriter {
             ));
         }
 
-        let content = fs::read_to_string(&file_path).with_context(|| {
-            format!("Failed to read file: {}", file_path.display())
-        })?;
+        let content = fs::read_to_string(&file_path)
+            .with_context(|| format!("Failed to read file: {}", file_path.display()))?;
 
         let new_content = self.insert_tweet_into_content(&content, text)?;
 
-        fs::write(&file_path, new_content).with_context(|| {
-            format!("Failed to write file: {}", file_path.display())
-        })?;
+        fs::write(&file_path, new_content)
+            .with_context(|| format!("Failed to write file: {}", file_path.display()))?;
 
         Ok(())
     }
@@ -212,7 +210,9 @@ mod tests {
 ### Notes
 Some notes here"#;
 
-        let result = writer.insert_tweet_into_content(content, "Test tweet").unwrap();
+        let result = writer
+            .insert_tweet_into_content(content, "Test tweet")
+            .unwrap();
         assert!(result.contains("### Tweets"));
         assert!(result.contains("Test tweet"));
     }
@@ -239,14 +239,13 @@ Some notes here"#;
         let mut config = create_test_config();
         config.target_directory = temp_dir.path().to_string_lossy().to_string();
         config.filename_format = "YYYY-MM-DD.md".to_string();
-        
+
         let writer = TweetWriter::new(config);
         let file_path = writer.get_target_file_path().unwrap();
-        
+
         let now = Local::now();
-        let expected_filename = format!("{}-{:02}-{:02}.md", 
-            now.year(), now.month(), now.day());
-        
+        let expected_filename = format!("{}-{:02}-{:02}.md", now.year(), now.month(), now.day());
+
         assert!(file_path.to_string_lossy().ends_with(&expected_filename));
     }
 }
