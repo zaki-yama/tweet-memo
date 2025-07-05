@@ -1,13 +1,17 @@
 [package]
-name = "tw"
+name = "tweet-memo"
 version = "0.1.0"
-edition = "2021"
-description = "Twitter風つぶやきをMarkdownファイルに記録するCLIツール"
-authors = ["Your Name <your.email@example.com>"]
+edition = "2024"
+description = "A CLI tool to record Twitter-style short memos in Markdown files"
+authors = ["Shingo Yamazaki <shingoyamazaki00@gmail.com>"]
 license = "MIT"
+repository = "https://github.com/zaki-yama/tweet-memo"
+readme = "README.md"
+keywords = ["cli", "markdown", "memo", "notes", "twitter"]
+categories = ["command-line-utilities", "text-processing"]
 
 [[bin]]
-name = "tw"
+name = "tm"
 path = "src/main.rs"
 
 [dependencies]
