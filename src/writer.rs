@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Context, Result};
 use chrono::Local;
+use colored::*;
 use std::fs;
 use std::path::PathBuf;
 
@@ -133,11 +134,13 @@ impl TweetWriter {
     pub fn format_tweet_display(&self, text: &str) -> String {
         let now = Local::now();
         let timestamp = now.format("%H:%M:%S").to_string();
+        let colored_timestamp = format!("[{}]", timestamp).bright_blue().bold();
 
         self.config
             .entry_format
             .replace("HH:mm:ss", &timestamp)
             .replace("{text}", text)
+            .replace(&format!("[{}]", timestamp), &colored_timestamp.to_string())
     }
 }
 

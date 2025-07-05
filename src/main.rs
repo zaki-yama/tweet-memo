@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::{Arg, Command};
+use colored::*;
 use std::io::{self, Write};
 
 mod config;
@@ -8,10 +9,24 @@ mod writer;
 use config::Config;
 use writer::TweetWriter;
 
+fn show_banner() {
+    let banner = r#"
+████████╗██╗    ██╗███████╗███████╗████████╗    ███╗   ███╗███████╗███╗   ███╗ ██████╗ 
+╚══██╔══╝██║    ██║██╔════╝██╔════╝╚══██╔══╝    ████╗ ████║██╔════╝████╗ ████║██╔═══██╗
+   ██║   ██║ █╗ ██║█████╗  █████╗     ██║       ██╔████╔██║█████╗  ██╔████╔██║██║   ██║
+   ██║   ██║███╗██║██╔══╝  ██╔══╝     ██║       ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║██║   ██║
+   ██║   ╚███╔███╔╝███████╗███████╗   ██║       ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝
+   ╚═╝    ╚══╝╚══╝ ╚══════╝╚══════╝   ╚═╝       ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ 
+"#;
+    println!("{}", banner.bright_blue());
+    println!("{}", "Twitter-style memo recorder".bright_white().bold());
+    println!();
+}
+
 fn main() -> Result<()> {
     let matches = Command::new("tm")
         .about("CLI tool for recording Twitter-style tweets to Markdown files")
-        .version("0.1.0")
+        .version("0.3.0")
         .arg(Arg::new("text").help("Text to record").index(1))
         .get_matches();
 
@@ -20,9 +35,14 @@ fn main() -> Result<()> {
 
     if let Some(text) = matches.get_one::<String>("text") {
         // Single tweet mode
+        show_banner();
         let writer = TweetWriter::new(config);
         writer.write_tweet(text)?;
-        println!("Tweet recorded: {}", text);
+        println!(
+            "{} {}",
+            "✓".bright_green().bold(),
+            format!("Tweet recorded: {}", text).bright_white()
+        );
     } else {
         // Interactive mode
         interactive_mode(config)?;
@@ -32,16 +52,19 @@ fn main() -> Result<()> {
 }
 
 fn interactive_mode(config: Config) -> Result<()> {
+    show_banner();
     let writer = TweetWriter::new(config);
 
+    println!("{}", "🚀 Interactive mode started!".bright_magenta().bold());
     println!(
-        "Interactive mode started. Type your tweets and press Enter. Type 'quit' or 'exit' to stop."
+        "{}",
+        "Type your tweets and press Enter. Type 'quit' or 'exit' to stop.".bright_white()
     );
-    println!("Press Ctrl+C to exit at any time.");
+    println!("{}", "Press Ctrl+C to exit at any time.".bright_black());
     println!();
 
     loop {
-        print!("> ");
+        print!("{} ", "❯".bright_cyan().bold());
         io::stdout().flush()?;
 
         let mut input = String::new();
@@ -54,7 +77,7 @@ fn interactive_mode(config: Config) -> Result<()> {
                 }
 
                 if text == "quit" || text == "exit" {
-                    println!("Goodbye!");
+                    println!("{}", "👋 Goodbye!".bright_yellow().bold());
                     break;
                 }
 
@@ -68,12 +91,20 @@ fn interactive_mode(config: Config) -> Result<()> {
                     }
                     Err(e) => {
                         print!("\x1B[1A\r\x1B[K");
-                        eprintln!("Error recording tweet: {}", e);
+                        eprintln!(
+                            "{} {}",
+                            "✗".bright_red().bold(),
+                            format!("Error recording tweet: {}", e).bright_red()
+                        );
                     }
                 }
             }
             Err(e) => {
-                eprintln!("Error reading input: {}", e);
+                eprintln!(
+                    "{} {}",
+                    "✗".bright_red().bold(),
+                    format!("Error reading input: {}", e).bright_red()
+                );
                 break;
             }
         }

@@ -1,6 +1,6 @@
 [package]
 name = "tweet-memo"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "A CLI tool to record Twitter-style short memos in Markdown files"
 authors = ["Shingo Yamazaki <shingoyamazaki00@gmail.com>"]
@@ -21,6 +21,7 @@ toml = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 dirs = "5.0"
 anyhow = "1.0"
+colored = "2.1"
 
 [dev-dependencies]
 tempfile = "3.8"
