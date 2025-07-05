@@ -19,7 +19,7 @@ The memo will be saved to a Markdown file with timestamp in the configured forma
 
 ## Configuration
 
-On first run, tweet-memo will create a configuration file at `~/.config/tw/config.toml` with these default settings:
+On first run, tweet-memo will create a configuration file at `~/.config/tweet-memo/config.toml` with these default settings:
 
 - **target_directory**: Current directory
 - **filename_format**: `YYYY-MM-DD.md`

@@ -1,9 +1,9 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::fs;
 use std::io::{self, Write};
 use std::path::PathBuf;
-use std::env;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -44,7 +44,7 @@ impl Config {
     }
 
     fn setup_wizard() -> Result<Self> {
-        println!("Welcome to tw! Let's set up your configuration.");
+        println!("Welcome to tweet-memo! Let's set up your configuration.");
         println!();
 
         let current_dir = env::current_dir()
@@ -52,25 +52,21 @@ impl Config {
             .to_string_lossy()
             .to_string();
 
-        let target_directory = Self::prompt_for_input(
-            "Target directory for Markdown files",
-            &current_dir,
-        )?;
+        let target_directory =
+            Self::prompt_for_input("Target directory for Markdown files", &current_dir)?;
 
         let filename_format = Self::prompt_for_input(
-            "Filename format (YYYY-MM-DD.md)",
+            "Filename format (use YYYY, MM, DD for date placeholders)",
             "YYYY-MM-DD.md",
         )?;
 
         let entry_format = Self::prompt_for_input(
-            "Entry format ([HH:mm:ss] {text})",
+            "Entry format (use HH:mm:ss for time, {text} for your input)",
             "[HH:mm:ss] {text}",
         )?;
 
-        let target_section = Self::prompt_for_input(
-            "Target section in Markdown files",
-            "### Tweets",
-        )?;
+        let target_section =
+            Self::prompt_for_input("Target section in Markdown files", "### Tweets")?;
 
         println!();
         println!("Configuration completed!");
@@ -125,7 +121,7 @@ impl Config {
         let home_dir = dirs::home_dir().context("Home directory not found")?;
         let config_dir = home_dir.join(".config");
 
-        Ok(config_dir.join("tw").join("config.toml"))
+        Ok(config_dir.join("tweet-memo").join("config.toml"))
     }
 
     pub fn expand_path(&self, path: &str) -> String {

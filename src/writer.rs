@@ -129,6 +129,16 @@ impl TweetWriter {
                 .replace("{text}", text)
         )
     }
+
+    pub fn format_tweet_display(&self, text: &str) -> String {
+        let now = Local::now();
+        let timestamp = now.format("%H:%M:%S").to_string();
+
+        self.config
+            .entry_format
+            .replace("HH:mm:ss", &timestamp)
+            .replace("{text}", text)
+    }
 }
 
 #[cfg(test)]
